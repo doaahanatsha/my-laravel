@@ -3,43 +3,69 @@
 namespace App\Http\Controllers;
 
 use App\Models\User;
-use Illuminate\Support\Facades\Hash;
+use App\Models\Volunteer;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Hash;
 
 class AuthController extends Controller
 {
-    public function login(Request $request)
-{
-    $request->validate([
-    'email' => 'required|email',
-    'password' => 'required',
-    ]);
+    public function register(Request $request)
+    {
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'email' => 'required|email|unique:users,email',
+            'password' => 'required|min:8',
+            'phone' => 'required|string',
+        ]);
 
-    $user = User::where('email', $request->email)->first();
+        $user = User::create([
+            'name' => $request->name,
+            'email' => $request->email,
+            'password' => Hash::make($request->password),
+            'role' => 'volunteer',
+        ]);
 
-    if (!$user || !Hash::check($request->password, $user->password)) {
-    return response()->json([
-        'message' => 'Invalid credentials'
-    ], 401);
+        Volunteer::create([
+            'user_id' => $user->id,
+            'phone' => $request->phone,
+        ]);
+
+        return response()->json([
+            'message' => 'Volunteer registered successfully',
+            'user' => $user,
+        ], 201);
     }
 
-
-    $token = $user->createToken('admin-token')->plainTextToken;
-
-    return response()->json([
-        'token' => $token,
-        'user' => $user,
-    ]);
-    
-}
-
-
-public function logout(Request $request)
+    public function login(Request $request)
 {
-    $request->user()->currentAccessToken()->delete();
+    $credentials = $request->validate([
+        'email' => 'required|email',
+        'password' => 'required|string',
+    ]);
+
+    if (!Auth::attempt($credentials)) {
+        return response()->json([
+            'message' => 'The provided credentials are incorrect.'
+        ], 401);
+    }
+
+    $user = $request->user();
+
+    $token = $user->createToken('api-token')->plainTextToken;
 
     return response()->json([
-        'message' => 'Logged out successfully'
+        'user' => $user,
+        'token' => $token,
     ]);
 }
+
+    public function logout(Request $request)
+    {
+        $request->user()->currentAccessToken()->delete();
+
+        return response()->json([
+            'message' => 'Logged out successfully'
+        ]);
+    }
 }
