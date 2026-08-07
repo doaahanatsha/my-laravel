@@ -51,9 +51,8 @@ class WorkLocationController extends Controller
     public function destroy(WorkLocation $workLocation)
     {
         $workLocation->delete();
-
-        return response()->json([
-            'message' => 'Work location deleted successfully.'
-        ]);
+return response()->json([
+    'message' => 'Work location deleted successfully.'
+], 200);
     }
 }
