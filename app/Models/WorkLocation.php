@@ -6,7 +6,12 @@ use Illuminate\Database\Eloquent\Model;
 
 class WorkLocation extends Model
 {
-     public function assignments()
+    protected $fillable = [
+        'name',
+        'address',
+    ];
+
+    public function assignments()
     {
         return $this->hasMany(Assignment::class);
     }

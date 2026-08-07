@@ -4,38 +4,44 @@ namespace App\Http\Controllers;
 
 use App\Models\User;
 use App\Models\Volunteer;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 
 class AuthController extends Controller
 {
-    public function register(Request $request)
-    {
-        $request->validate([
-            'name' => 'required|string|max:255',
-            'email' => 'required|email|unique:users,email',
-            'password' => 'required|min:8',
-            'phone' => 'required|string',
-        ]);
+    public function register(Request $request) 
+{ 
+    $request->validate([ 
+        'name' => 'required|string|max:255', 
+        'email' => 'required|email|unique:users,email', 
+        'password' => 'required|min:8', 
+        'phone' => 'required|string', 
+    ]); 
 
-        $user = User::create([
-            'name' => $request->name,
-            'email' => $request->email,
-            'password' => Hash::make($request->password),
-            'role' => 'volunteer',
-        ]);
+    $user = DB::transaction(function () use ($request) {
+        $user = User::create([ 
+            'name' => $request->name, 
+            'email' => $request->email, 
+            'password' => Hash::make($request->password), 
+            'role' => 'volunteer', 
+        ]); 
 
-        Volunteer::create([
-            'user_id' => $user->id,
-            'phone' => $request->phone,
-        ]);
+        Volunteer::create([ 
+            'user_id' => $user->id, 
+            'phone' => $request->phone, 
+        ]); 
 
-        return response()->json([
-            'message' => 'Volunteer registered successfully',
-            'user' => $user,
-        ], 201);
-    }
+        return $user;
+    });
+
+    return response()->json([ 
+        'message' => 'Volunteer registered successfully', 
+        'user' => $user, 
+    ], 201); 
+}
+
 
     public function login(Request $request)
 {
