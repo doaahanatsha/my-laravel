@@ -3,6 +3,7 @@
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\WorkLocationController;
 use App\Http\Controllers\TaskController;
+use App\Http\Controllers\VolunteerController;
 use Illuminate\Support\Facades\Route;
 
 // Public Routes
@@ -13,6 +14,9 @@ Route::post('/login', [AuthController::class, 'login']);
 Route::middleware('auth:sanctum')->group(function () {
 
     Route::post('/logout', [AuthController::class, 'logout']);
+
+    Route::get('/me', [VolunteerController::class, 'me']);
+    Route::put('/me', [VolunteerController::class, 'updateMe']);
 
     // Any authenticated user (Admin + Volunteer)
     Route::apiResource('work-locations', WorkLocationController::class)
@@ -30,6 +34,7 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::apiResource('tasks', TaskController::class)
             ->except(['index', 'show']);
 
+        Route::apiResource('volunteers', VolunteerController::class);
     });
 
 });

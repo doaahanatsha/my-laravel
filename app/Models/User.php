@@ -16,12 +16,8 @@ use Illuminate\Notifications\Notifiable;
 class User extends Authenticatable
 {
     /** @use HasFactory<UserFactory> */
-   use HasApiTokens, HasFactory, Notifiable;
-    /**
-     * Get the attributes that should be cast.
-     *
-     * @return array<string, string>
-     */
+    use HasApiTokens, HasFactory, Notifiable;
+
     protected function casts(): array
     {
         return [
@@ -29,8 +25,14 @@ class User extends Authenticatable
             'password' => 'hashed',
         ];
     }
+
     public function volunteer()
-{
-    return $this->hasOne(Volunteer::class);
-}
+    {
+        return $this->hasOne(Volunteer::class);
+    }
+
+    public function isAdmin(): bool
+    {
+        return $this->role === 'admin';
+    }
 }
