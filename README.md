@@ -1,58 +1,346 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# Volunteer Coordination API
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+A Laravel-based REST API for coordinating volunteers and assigning them to tasks across different work locations.
 
-## About Laravel
+This project was built as part of the Back-End (Laravel) training track.
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+## Requirements
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+- PHP 8.2+
+- Composer
+- MySQL or PostgreSQL
+- Laravel 13
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+## Installation
 
-## Learning Laravel
-
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
-
-In addition, [Laracasts](https://laracasts.com) contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
-
-You can also watch bite-sized lessons with real-world projects on [Laravel Learn](https://laravel.com/learn), where you will be guided through building a Laravel application from scratch while learning PHP fundamentals.
-
-## Agentic Development
-
-Laravel's predictable structure and conventions make it ideal for AI coding agents like Claude Code, Cursor, and GitHub Copilot. Install [Laravel Boost](https://laravel.com/docs/ai) to supercharge your AI workflow:
+Clone the repository:
 
 ```bash
-composer require laravel/boost --dev
-
-php artisan boost:install
+git clone https://github.com/doaahanatsha/my-laravel.git
+cd my-laravel
 ```
 
-Boost provides your agent 15+ tools and skills that help agents build Laravel applications while following best practices.
+Install dependencies:
 
-## Contributing
+```bash
+composer install
+```
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+Create the environment file:
 
-## Code of Conduct
+```bash
+cp .env.example .env
+```
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+Generate the application key:
 
-## Security Vulnerabilities
+```bash
+php artisan key:generate
+```
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+Configure your database credentials in the `.env` file.
+
+Run the migrations:
+
+```bash
+php artisan migrate
+```
+
+Seed the database:
+
+```bash
+php artisan db:seed
+```
+
+Start the development server:
+
+```bash
+php artisan serve
+```
+
+The API will be available at:
+
+```text
+http://127.0.0.1:8000
+```
+
+## Test Credentials
+
+The database seeders create the following test accounts:
+
+| Role | Email | Password |
+|---|---|---|
+| Admin | admin@gmail.com | 12345678 |
+| Volunteer | volunteer@gmail.com | 12345678 |
+
+The Volunteer account also has a volunteer profile.
+
+## Authentication
+
+The API uses Laravel Sanctum for token-based authentication.
+
+Login:
+
+```text
+POST /api/login
+```
+
+The login response provides an authentication token.
+
+For protected endpoints, send the token using:
+
+```text
+Authorization: Bearer <token>
+```
+
+## API Endpoints
+
+### Authentication
+
+| Method | Endpoint | Access |
+|---|---|---|
+| POST | `/api/register` | Public |
+| POST | `/api/login` | Public |
+| POST | `/api/logout` | Authenticated |
+
+### Profile
+
+| Method | Endpoint | Access |
+|---|---|---|
+| GET | `/api/me` | Volunteer |
+| PUT | `/api/me` | Volunteer |
+
+These endpoints operate on the currently authenticated volunteer's own profile.
+
+### Work Locations
+
+| Method | Endpoint | Access |
+|---|---|---|
+| GET | `/api/work-locations` | Admin + Volunteer |
+| GET | `/api/work-locations/{id}` | Admin + Volunteer |
+| POST | `/api/work-locations` | Admin |
+| PUT/PATCH | `/api/work-locations/{id}` | Admin |
+| DELETE | `/api/work-locations/{id}` | Admin |
+
+Volunteers can view work locations but cannot create, update, or delete them.
+
+### Tasks
+
+| Method | Endpoint | Access |
+|---|---|---|
+| GET | `/api/tasks` | Admin + Volunteer |
+| GET | `/api/tasks/{id}` | Admin + Volunteer |
+| POST | `/api/tasks` | Admin |
+| PUT/PATCH | `/api/tasks/{id}` | Admin |
+| DELETE | `/api/tasks/{id}` | Admin |
+
+Volunteers can view tasks but cannot create, update, or delete them.
+
+### Volunteers
+
+| Method | Endpoint | Access |
+|---|---|---|
+| GET | `/api/volunteers` | Admin |
+| GET | `/api/volunteers/{id}` | Admin |
+| POST | `/api/volunteers` | Admin |
+| PUT/PATCH | `/api/volunteers/{id}` | Admin |
+| DELETE | `/api/volunteers/{id}` | Admin |
+
+Volunteer management is restricted to administrators.
+
+### Assignments
+
+| Method | Endpoint | Access |
+|---|---|---|
+| GET | `/api/assignments` | Admin |
+| GET | `/api/assignments/{id}` | Admin |
+| POST | `/api/assignments` | Admin |
+| PUT/PATCH | `/api/assignments/{id}` | Admin |
+| DELETE | `/api/assignments/{id}` | Admin |
+| GET | `/api/my-assignments` | Volunteer |
+
+The `/api/my-assignments` endpoint returns only assignments belonging to the currently authenticated volunteer.
+
+A volunteer cannot use this endpoint to access another volunteer's assignments.
+
+## Authorization
+
+The API uses role-based authorization to separate Admin and Volunteer permissions.
+
+### Admin
+
+Administrators can:
+
+- Manage work locations.
+- Manage tasks.
+- Manage volunteers.
+- Create, update, and delete assignments.
+- View all assignments.
+
+Admin-only routes are protected by the `admin` middleware.
+
+### Volunteer
+
+Volunteers can:
+
+- View work locations.
+- View tasks.
+- View their own profile.
+- Update their own profile.
+- View their own assignments.
+
+Volunteers cannot access admin-only operations.
+
+An authenticated volunteer attempting an admin-only operation receives:
+
+```text
+403 Forbidden
+```
+
+## Validation
+
+The project uses Laravel Form Requests for request validation.
+
+Invalid request data returns:
+
+```text
+422 Unprocessable Entity
+```
+
+Assignment validation uses `exists` rules to make sure that referenced volunteers, work locations, and tasks exist in the database.
+
+## Error Handling
+
+The API uses standard HTTP status codes:
+
+| Status | Meaning |
+|---|---|
+| 200 | Successful request |
+| 201 | Resource created |
+| 401 | Unauthenticated |
+| 403 | Forbidden |
+| 404 | Resource not found |
+| 422 | Validation error |
+
+Laravel Route Model Binding is used for resource endpoints, so requesting a non-existing resource returns `404 Not Found`.
+
+## API Resources
+
+The project uses Laravel API Resources to structure API responses.
+
+Resources include:
+
+- `AssignmentResource`
+- `VolunteerResource`
+- `TaskResource`
+- `WorkLocationResource`
+
+These resources control the structure of returned API data and include the required relationship information.
+
+## Eloquent Relationships
+
+The project uses Eloquent relationships between the main models:
+
+- `User` has one `Volunteer`.
+- `Volunteer` belongs to a `User`.
+- `Volunteer` has many `Assignments`.
+- `Assignment` belongs to a `Volunteer`.
+- `Assignment` belongs to a `Task`.
+- `Assignment` belongs to a `WorkLocation`.
+
+## Main Models
+
+- User
+- Volunteer
+- Task
+- WorkLocation
+- Assignment
+
+## Database Seeders
+
+The project includes:
+
+- `AdminSeeder`
+- `VolunteerSeeder`
+
+The main `DatabaseSeeder` calls both seeders.
+
+Run:
+
+```bash
+php artisan db:seed
+```
+
+This creates the default Admin and Volunteer test accounts.
+
+## Testing
+
+The API was tested using Postman.
+
+Testing covers:
+
+- Admin authentication.
+- Volunteer authentication.
+- Protected endpoints.
+- Admin-only authorization.
+- Volunteer access to authenticated resources.
+- `403 Forbidden` for unauthorized volunteer actions.
+- `401 Unauthorized` for unauthenticated requests.
+- `404 Not Found` for non-existing resources.
+- `422 Unprocessable Entity` for validation errors.
+- Assignment creation.
+- Assignment update.
+- Assignment deletion.
+- Retrieving the authenticated volunteer's assignments.
+- Preventing volunteers from accessing another volunteer's assignments.
+
+## Project Structure
+
+```text
+app/
+├── Http/
+│   ├── Controllers/
+│   ├── Middleware/
+│   ├── Requests/
+│   └── Resources/
+├── Models/
+└── Policies/
+
+database/
+├── migrations/
+└── seeders/
+
+routes/
+└── api.php
+```
+
+## Tech Stack
+
+- PHP 8.2+
+- Laravel 12
+- Laravel Sanctum
+- Eloquent ORM
+- MySQL / PostgreSQL
+- Postman
+
+## API Base URL
+
+When running the application locally:
+
+```text
+http://127.0.0.1:8000/api
+```
+
+## Repository
+
+GitHub repository:
+
+https://github.com/doaahanatsha/my-laravel
+
+## Postman Collection
+
+A Postman collection for testing the API endpoints for both Admin and Volunteer roles is included in the project repository.
 
 ## License
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+This project was created as part of the Back-End (Laravel) training track.

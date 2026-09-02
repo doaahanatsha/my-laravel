@@ -4,6 +4,7 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\WorkLocationController;
 use App\Http\Controllers\TaskController;
 use App\Http\Controllers\VolunteerController;
+use App\Http\Controllers\AssignmentController;
 use Illuminate\Support\Facades\Route;
 
 // Public Routes
@@ -17,6 +18,9 @@ Route::middleware('auth:sanctum')->group(function () {
 
     Route::get('/me', [VolunteerController::class, 'me']);
     Route::put('/me', [VolunteerController::class, 'updateMe']);
+
+    // Volunteer own assignments
+    Route::get('/my-assignments', [AssignmentController::class, 'myAssignments']);
 
     // Any authenticated user (Admin + Volunteer)
     Route::apiResource('work-locations', WorkLocationController::class)
@@ -35,6 +39,9 @@ Route::middleware('auth:sanctum')->group(function () {
             ->except(['index', 'show']);
 
         Route::apiResource('volunteers', VolunteerController::class);
+
+        Route::apiResource('assignments', AssignmentController::class)
+            ->only(['index', 'store', 'show', 'update', 'destroy']);
     });
 
 });
