@@ -13,6 +13,6 @@ class Task extends Model
 
     public function assignments()
     {
-        return $this->hasOne(Assignment::class);
+        return $this->hasMany(Assignment::class);
     }
 }
