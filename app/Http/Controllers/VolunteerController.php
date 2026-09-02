@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\StoreVolunteerRequest;
+use Illuminate\Support\Facades\Hash;
 use App\Http\Requests\UpdateVolunteerRequest;
 use App\Http\Requests\UpdateOwnProfileRequest;
 use App\Http\Resources\VolunteerResource;
@@ -31,7 +32,7 @@ class VolunteerController extends Controller
         $user = User::create([
             'name' => $request->validated('name'),
             'email' => $request->validated('email'),
-            'password' => $request->validated('password'),
+            'password' => Hash::make($request->validated('password')),
             'role' => 'volunteer',
         ]);
 
